@@ -16,6 +16,7 @@ import shared.Protocol;
 public class Client extends Thread implements EchoListener {
 
     Socket socket;
+    
     private int port;
     private InetAddress serverAddress;
     private Scanner input;
