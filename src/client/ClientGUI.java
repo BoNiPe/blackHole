@@ -113,6 +113,8 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
         try {
             String toBeDisplayed = "";
+            
+            
             currentClient.send(Protocol.MESSAGE + jTextFieldSend.getText());
             jTextFieldSend.setText("");
             Thread.sleep(100);
