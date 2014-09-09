@@ -9,6 +9,8 @@ import shared.Protocol;
 
 public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
+    
+    
     Client currentClient;
 
     public ClientGUI() {
