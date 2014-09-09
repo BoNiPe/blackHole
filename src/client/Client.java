@@ -1,5 +1,8 @@
-package client;
 
+
+//// NOVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaaa
+
+package client;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -35,7 +38,7 @@ public class Client extends Thread implements EchoListener {
     public void run() {
         String msg = input.nextLine();
         //globalMessage.add(msg);
-        while (!msg.equals(Protocol.STOP)) {
+        while (!msg.equals(Protocol.CLOSE)) {
             globalMessage.add(msg);
             notifyListeners(msg);
             msg = input.nextLine();
@@ -55,7 +58,7 @@ public class Client extends Thread implements EchoListener {
     }
 
     public void stopClient() throws IOException {
-        output.println(Protocol.STOP);
+        output.println(Protocol.CLOSE);
     }
     
       public void registerEchoListener(EchoListener l)
@@ -89,6 +92,6 @@ public class Client extends Thread implements EchoListener {
 
     @Override
     public void messageArrived(String data) {
-        System.out.println("Data: (FROM ECHO CLIENT): " + data);
+        System.out.println("messageArrived(String data) (Client): " + data);
     }
 }

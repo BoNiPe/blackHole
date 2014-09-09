@@ -13,6 +13,10 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     public ClientGUI() {
         initComponents();
+        jButtonDisconnect.setEnabled(false);
+        jButtonSend.setEnabled(false);
+        jTextFieldSend.setEnabled(false);
+        jTextPaneChat.setEnabled(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -109,50 +113,56 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
-        try {
-            String toBeDisplayed = "";
+
+        if (!jTextFieldSend.getText().contains(Protocol.NICKNAME)) {
             currentClient.send(Protocol.MESSAGE + jTextFieldSend.getText());
-            jTextFieldSend.setText("");
-            Thread.sleep(100);
-            for (int i = 0; i < currentClient.globalMessage.size(); i++) {
-                toBeDisplayed += currentClient.globalMessage.get(i) + "\n";
-            }
-            //toBeDisplayed += currentClient.get
-            jTextPaneChat.setText(toBeDisplayed);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            currentClient.send(jTextFieldSend.getText());
         }
+        jTextFieldSend.setText("");
         jTextFieldSend.requestFocus();
     }//GEN-LAST:event_jButtonSendActionPerformed
 
     private void jButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnectActionPerformed
-                currentClient = new Client();
-        
-        if (!currentClient.isClientConnected(currentClient)) {
-             Object name = JOptionPane.showInputDialog("Enter bankacc:");
-
+        currentClient = new Client();
+//if statement if that client with that name is connected.
+        Object name = JOptionPane.showInputDialog("Nickname:");
+        if (name.toString().length() <= 8) {
             int port = 9090;
             String ip = "localhost";
             try {
 
                 currentClient.connect(ip, port); //connects to server
                 currentClient.registerEchoListener(this); //registers itself
-                currentClient.send("/n " + name.toString());
+                currentClient.send(Protocol.CONNECT + name.toString());
+
+                jButtonDisconnect.setEnabled(true);
+                jButtonSend.setEnabled(true);
+                jTextFieldSend.setEnabled(true);
+                jButtonConnect.setEnabled(false);
+                jTextPaneChat.setEnabled(true);
+                jTextPaneChat.setEditable(false);
             } catch (UnknownHostException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "U R ALREADY IN, NIGGA? YOLO MUCH?", "ERROR", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Nickname is too long.", "ERROR", JOptionPane.WARNING_MESSAGE);
         }
+
     }//GEN-LAST:event_jButtonConnectActionPerformed
 
     private void jButtonDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisconnectActionPerformed
-        try { 
+        try {
             currentClient.stopClient();
             currentClient.unRegisterEchoListener(this);
-
+            jButtonDisconnect.setEnabled(false);
+            jButtonSend.setEnabled(false);
+            jTextFieldSend.setEnabled(false);
+            jButtonConnect.setEnabled(true);
+            jTextPaneChat.setEnabled(false);
+            jTextPaneChat.setEditable(true);
         } catch (IOException ex) {
             Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -203,10 +213,15 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     @Override
     public void messageArrived(String data) {
-    String toBeDisplayed = "";
+        System.out.println("messageArrived(String data) (ClientGUI): " + data);
+        String toBeDisplayed = "";
         for (int i = 0; i < currentClient.globalMessage.size(); i++) {
+            if (currentClient.globalMessage.contains(Protocol.NICKNAME)) {
+                toBeDisplayed += "***" + currentClient.globalMessage.get(i) + "***\n";
+            } else {
                 toBeDisplayed += currentClient.globalMessage.get(i) + "\n";
             }
-            jTextPaneChat.setText(toBeDisplayed);    
+        }
+        jTextPaneChat.setText(toBeDisplayed);
     }
 }
