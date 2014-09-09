@@ -51,6 +51,10 @@ public class Client extends Thread implements EchoListener {
     }
 
     public void send(String message) {
+        if(message.contains(Protocol.SEND))
+        {
+            System.out.println(message);  
+        }
         output.println(message);
     }
 

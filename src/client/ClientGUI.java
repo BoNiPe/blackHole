@@ -141,10 +141,16 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
 
-        if (!jTextFieldSend.getText().contains(Protocol.NICKNAME)) {
-            currentClient.send(Protocol.MESSAGE + jTextFieldSend.getText());
-        } else {
+        if (jTextFieldSend.getText().contains(Protocol.NICKNAME)) {
             currentClient.send(jTextFieldSend.getText());
+
+        } else if (jLabelMessageType.getText().contains("Everyone"))
+        {
+            currentClient.send(Protocol.SEND + Protocol.ALL + jTextFieldSend.getText());
+        }
+        
+        else {
+            currentClient.send(Protocol.SEND + jTextFieldSend.getText());
         }
         jTextFieldSend.setText("");
         jTextFieldSend.requestFocus();
@@ -194,7 +200,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
             jListOnline.setEnabled(false);
             jTextPaneChat.setEditable(true);
             onlineClients.clear();
-            jTextPaneChat.setText("");
+            //jTextPaneChat.setText("");
         } catch (IOException ex) {
             Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -203,11 +209,10 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private void jListOnlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListOnlineMouseClicked
         if (jLabelMessageType.getText().contains("Everyone")) {
             jLabelMessageType.setText("to " + jListOnline.getSelectedValue().toString() + ":");
+        } else {
+            jLabelMessageType.setText(jLabelMessageType.getText().replace(":", "," + jListOnline.getSelectedValue().toString() + ":"));
         }
-        else {
-            jLabelMessageType.setText(jLabelMessageType.getText().replace(":", ","+ jListOnline.getSelectedValue().toString() + ":"));
-        }
-        
+
     }//GEN-LAST:event_jListOnlineMouseClicked
 
     public static void main(String args[]) {

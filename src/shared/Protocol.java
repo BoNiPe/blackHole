@@ -15,4 +15,8 @@ public class Protocol {
     
     public static final String ONLINE = "ONLINE#";
     
+    public static final String HashTag = "#";
+    
+    public static final String ALL = "*#";
+    
 }

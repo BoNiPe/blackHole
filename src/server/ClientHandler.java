@@ -20,6 +20,7 @@ public class ClientHandler extends Thread {
     private Server myServer;
     private String nickname;
     private String listOfHandlerNames;
+    private boolean isStopped = false;
 
     public ClientHandler(Socket socket, Server myServer) {
         try {
@@ -35,38 +36,38 @@ public class ClientHandler extends Thread {
 
     @Override
     public void run() {
-        String message = input.nextLine(); //IMPORTANT blocking call
-        Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
-        while (!message.equals(Protocol.CLOSE)) {
-           
+        String message = "";
+        do {
+
+            message = input.nextLine(); //IMPORTANT blocking call
+
             if (message.contains(Protocol.NICKNAME)) {
+
                 String[] result = message.split("#");
-                System.out.println("Nickname.");
-                if (result[1].length() <= 8) {
-                    send(Protocol.NICKNAME + result[1]);
-                    setNickname(result[1]);
-                    send();
-                } else {
-                    send("Nickname is not suitable!");
-                }
-            } else if (message.contains(Protocol.MESSAGE)) {
-                System.out.println("Simple message.");
-                send(message);
+                send(Protocol.NICKNAME + result[1]);
+                setNickname(result[1]);
+                send();
+
+            } else if (message.contains(Protocol.SEND)) {
+
+                String[] result = message.split("#");
+                send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[2]);
                 Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
+
             } else if (message.contains(Protocol.CONNECT)) {
-                System.out.println("Connect.");
+
                 String[] result = message.split("#");
                 setNickname(result[1]);
-                send(Protocol.CONNECT + getNickname());
-                //listOfNicknames.add(getNickname());
                 send();
+
+            } else if (message.contains(Protocol.CLOSE)) {
+                isStopped = true;
             }
-            message = input.nextLine(); //IMPORTANT blocking call
-            
-        }  
+
+        } while (!isStopped);
+
         writer.println(Protocol.CLOSE);//Echo the stop message back to the client for a nice closedown
         try {
-            send(Protocol.CLOSE);
             socket.close();
             myServer.removeHandler(this);
             send();
@@ -80,12 +81,14 @@ public class ClientHandler extends Thread {
     private void send(String msg) {
         String ip = socket.getInetAddress().getHostAddress();
         int port = socket.getPort();
+        //sout " (" + ip + ":" + port + ") :"
+        //getNickname() + " " +  (additional stuff)
 
         for (ClientHandler handler : myServer.getListofECH()) {
-            handler.writer.println(getNickname() + " (" + ip + ":" + port + ") :" + msg);
+            handler.writer.println(msg);
         }
     }
-    
+
     //List of active users
     private void send() {
         listOfHandlerNames = "";

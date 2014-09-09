@@ -52,7 +52,6 @@ public class Server {
     
         public synchronized void removeHandler(ClientHandler clientToBeDeleted) {
         ClientHandler temp = null;
-        System.out.println("size: " + listofECH.size());
         for (ClientHandler clientFromList : listofECH) {
             if (clientFromList == clientToBeDeleted) {
                 temp = clientFromList;
