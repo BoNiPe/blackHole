@@ -39,7 +39,7 @@ public class Client extends Thread implements EchoListener {
             globalMessage.add(msg);
             notifyListeners(msg);
             msg = input.nextLine();
-            messageArrived(msg);
+            //messageArrived(msg);
         }
         try {
             socket.close();
@@ -51,6 +51,10 @@ public class Client extends Thread implements EchoListener {
     }
 
     public void send(String message) {
+        if(message.contains(Protocol.SEND))
+        {
+            System.out.println(message);  
+        }
         output.println(message);
     }
 

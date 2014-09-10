@@ -1,0 +1,14 @@
+Sep 10, 2014 4:25:42 PM server.Server startServer
+INFO: Sever started
+Sep 10, 2014 4:25:51 PM server.Server startServer
+INFO: Connected to a client
+Sep 10, 2014 4:25:55 PM server.Server startServer
+INFO: Connected to a client
+Sep 10, 2014 4:25:59 PM server.ClientHandler run
+INFO: Received the message: SEND#*#HEY 
+Sep 10, 2014 4:26:04 PM server.ClientHandler run
+INFO: Received the message: SEND#*#BRO 
+Sep 10, 2014 4:26:06 PM server.ClientHandler run
+INFO: Closed a Connection
+Sep 10, 2014 4:26:07 PM server.ClientHandler run
+INFO: Closed a Connection
