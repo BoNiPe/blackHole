@@ -40,28 +40,39 @@ public class ClientHandler extends Thread {
         do {
 
             message = input.nextLine(); //IMPORTANT blocking call
+            if (message.contains(Protocol.ALL) || message.contains(Protocol.CONNECT)) {
+                if (message.contains(Protocol.NICKNAME)) {
 
-            if (message.contains(Protocol.NICKNAME)) {
+                    String[] result = message.split("#");
+                    send(Protocol.NICKNAME + result[1]);
+                    setNickname(result[1]);
+                    send();
 
-                String[] result = message.split("#");
-                send(Protocol.NICKNAME + result[1]);
-                setNickname(result[1]);
-                send();
+                } else if (message.contains(Protocol.SEND)) {
 
-            } else if (message.contains(Protocol.SEND)) {
+                    String[] result = message.split("#");
+                    int size = result.length;
+                    if (size == 3) {
+                        send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[2]);
+                    } else if (size == 2) {
+                        send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[1]);
+                    }
+                    Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
 
-                String[] result = message.split("#");
-                send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[2]);
-                Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
+                } else if (message.contains(Protocol.CONNECT)) {
 
-            } else if (message.contains(Protocol.CONNECT)) {
+                    String[] result = message.split("#");
+                    setNickname(result[1]);
+                    send();
 
-                String[] result = message.split("#");
-                setNickname(result[1]);
-                send();
-
+                }
             } else if (message.contains(Protocol.CLOSE)) {
                 isStopped = true;
+            } else {
+                String[] splitMessageString = message.split("#");
+                if (splitMessageString[1].contains(",")) {
+                    send(splitMessageString);
+                }
             }
 
         } while (!isStopped);
@@ -103,9 +114,25 @@ public class ClientHandler extends Thread {
 
         }
         for (int i = 0; i < ammountOfClients; i++) {
+
             myServer.getListofECH().get(i).writer.println(Protocol.ONLINE + listOfHandlerNames);
+
         }
 
+    }
+
+    private void send(String[] splitMessageString) {
+
+        String[] listOfClientsToReceiveMessage = splitMessageString[1].split(",");
+        int size = myServer.getListofECH().size();
+        for (int i = 0; i < listOfClientsToReceiveMessage.length; i++) {
+            for (int j = 0; j < size; j++) {
+                if (myServer.getListofECH().get(j).getNickname().equals(listOfClientsToReceiveMessage[i])) //send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[1]);
+                {
+                    myServer.getListofECH().get(j).writer.println(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[2]);
+                }
+            }
+        }
     }
 
     public String getNickname() {

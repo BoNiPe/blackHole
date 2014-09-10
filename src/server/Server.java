@@ -46,7 +46,7 @@ public class Server {
         //Utilities.closeLogger(EchoServer.class.getName());
     }
 
-    public void stopServer() {
+    public static void stopServer() {
         isAlive = false;
     }
     
