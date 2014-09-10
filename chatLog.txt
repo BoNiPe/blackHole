@@ -1,0 +1,8 @@
+Sep 10, 2014 4:12:13 PM server.Server startServer
+INFO: Sever started
+Sep 10, 2014 4:12:29 PM server.Server startServer
+INFO: Connected to a client
+Sep 10, 2014 4:12:32 PM server.Server startServer
+INFO: Connected to a client
+Sep 10, 2014 4:12:37 PM server.ClientHandler run
+INFO: Received the message: SEND#*#PUSH IT PUSH IT 

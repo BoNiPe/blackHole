@@ -40,48 +40,41 @@ public class ClientHandler extends Thread {
         do {
 
             message = input.nextLine(); //IMPORTANT blocking call
-            if (message.contains(Protocol.ALL) || message.contains(Protocol.CONNECT)) {
-                if (message.contains(Protocol.NICKNAME)) {
-
-                    String[] result = message.split("#");
-                    send(Protocol.NICKNAME + result[1]);
-                    setNickname(result[1]);
-                    send();
-
-                } else if (message.contains(Protocol.SEND)) {
-
-                    String[] result = message.split("#");
-                    int size = result.length;
-                    if (size == 3) {
-                        send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[2]);
-                    } else if (size == 2) {
-                        send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[1]);
-                    }
-                    Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
-
-                } else if (message.contains(Protocol.CONNECT)) {
-
-                    String[] result = message.split("#");
-                    setNickname(result[1]);
-                    send();
-
+            if (message.contains(Protocol.ALL)) {
+                String[] result = message.split("#");
+                int size = result.length;
+                if (size == 3) {
+                    send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[2]);
+                } else if (size == 2) {
+                    send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[1]);
                 }
+                Logger.getLogger(Server.class.getName()).log(Level.INFO, String.format("Received the message: %1$S ", message));
+
+            } else if (message.contains(Protocol.CONNECT)) {
+                String[] result = message.split("#");
+                setNickname(result[1]); //Extract Client's nickname
+                send(); //List of active users
+            } else if (message.contains(Protocol.NICKNAME)) {
+
+                String[] result = message.split("#");
+                send(Protocol.NICKNAME + result[1]);
+                setNickname(result[1]);
+                send();
+
             } else if (message.contains(Protocol.CLOSE)) {
-                isStopped = true;
-            } else {
+                isStopped = true; //Go out of do while
+            } else { //Whispering
                 String[] splitMessageString = message.split("#");
-                if (splitMessageString[1].contains(",")) {
-                    send(splitMessageString);
-                }
+                send(splitMessageString);
             }
-
         } while (!isStopped);
 
         writer.println(Protocol.CLOSE);//Echo the stop message back to the client for a nice closedown
+        
         try {
             socket.close();
             myServer.removeHandler(this);
-            send();
+            send(); //Refreshing the list of active clients for the others, who are still connected.
         } catch (IOException ex) {
             Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -90,8 +83,8 @@ public class ClientHandler extends Thread {
 
     //Generated send message
     private void send(String msg) {
-        String ip = socket.getInetAddress().getHostAddress();
-        int port = socket.getPort();
+        //String ip = socket.getInetAddress().getHostAddress();
+        //int port = socket.getPort();
         //sout " (" + ip + ":" + port + ") :"
         //getNickname() + " " +  (additional stuff)
 
@@ -111,7 +104,6 @@ public class ClientHandler extends Thread {
             } else {
                 listOfHandlerNames += myServer.getListofECH().get(i).getNickname();
             }
-
         }
         for (int i = 0; i < ammountOfClients; i++) {
 
@@ -121,14 +113,21 @@ public class ClientHandler extends Thread {
 
     }
 
+    //Whispering til en person eller mange mennesker
     private void send(String[] splitMessageString) {
-
-        String[] listOfClientsToReceiveMessage = splitMessageString[1].split(",");
         int size = myServer.getListofECH().size();
-        for (int i = 0; i < listOfClientsToReceiveMessage.length; i++) {
+        if (splitMessageString[1].contains(",")) { //, means that there are more than 1 names
+            String[] listOfClientsToReceiveMessage = splitMessageString[1].split(",");
+            for (int i = 0; i < listOfClientsToReceiveMessage.length; i++) {
+                for (int j = 0; j < size; j++) {
+                    if (myServer.getListofECH().get(j).getNickname().equals(listOfClientsToReceiveMessage[i])) {
+                        myServer.getListofECH().get(j).writer.println(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[2]);
+                    }
+                }
+            }
+        } else { //If there is only one name
             for (int j = 0; j < size; j++) {
-                if (myServer.getListofECH().get(j).getNickname().equals(listOfClientsToReceiveMessage[i])) //send(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[1]);
-                {
+                if (myServer.getListofECH().get(j).getNickname().equals(splitMessageString[1])) {
                     myServer.getListofECH().get(j).writer.println(Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[2]);
                 }
             }

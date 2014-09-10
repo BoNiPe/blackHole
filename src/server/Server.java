@@ -28,7 +28,7 @@ public class Server {
         int port = Integer.parseInt(properties.getProperty("port"));
         String ip = properties.getProperty("serverIp");
         String logFile = properties.getProperty("logFile");
-        //Utils.setLogFile(logFile, Server.class.getName());
+        Utilities.setLogFile(logFile, Server.class.getName());
         Logger.getLogger(Server.class.getName()).log(Level.INFO, "Sever started");
         try {
             serverSocket = new ServerSocket();
@@ -43,7 +43,7 @@ public class Server {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println("SERVER CLOSED");
-        //Utilities.closeLogger(EchoServer.class.getName());
+        Utilities.closeLogger(Server.class.getName());
     }
 
     public static void stopServer() {

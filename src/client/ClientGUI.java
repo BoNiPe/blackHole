@@ -178,7 +178,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
 
-        if (jLabelMessageType.equals("Change your 'Nickname' to: ")) {
+        if (jLabelMessageType.getText().contains("'Nickname'")) {
             if (jTextFieldSend.getText().length() <= 8) {
                 currentClient.send(Protocol.NICKNAME + jTextFieldSend.getText());
                 jLabelYou.setText("You: " + jTextFieldSend.getText());
@@ -198,6 +198,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
         }
         jTextFieldSend.setText("");
         jTextFieldSend.requestFocus();
+        jButtonNickname.setEnabled(true);
         jLabelMessageType.setText("to Everyone:");
     }//GEN-LAST:event_jButtonSendActionPerformed
 
@@ -334,7 +335,9 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
             String[] result = data.split("#");
             List<String> items = Arrays.asList(result[1].split("\\s*,\\s*"));
             for (int i = 0; i < items.size(); i++) {
-                onlineClients.addElement(items.get(i));
+                if (!jLabelYou.getText().contains(items.get(i))) {
+                    onlineClients.addElement(items.get(i));
+                }
             }
             jListOnline.setModel(onlineClients);
         }
