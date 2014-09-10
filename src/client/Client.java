@@ -1,7 +1,6 @@
 package client;
 
 import java.io.IOException;
-
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -16,7 +15,6 @@ import shared.Protocol;
 public class Client extends Thread implements EchoListener {
 
     Socket socket;
-    
     private int port;
     private InetAddress serverAddress;
     private Scanner input;
