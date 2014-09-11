@@ -184,7 +184,7 @@ public class TestSeveralClients {
         Thread.sleep(100);
         assertEquals("MESSAGE#Superman#Hey dudes", msg);
         assertEquals("MESSAGE#Superman#Hey dudes", msg2);
-        assertEquals("", msg3);
+        assertFalse("MESSAGE#Superman#Hey dudes"== msg3);
     }
 
     @Test
@@ -269,7 +269,7 @@ public class TestSeveralClients {
         superman.registerEchoListener(listen4);
         superman.connect("localhost", 9090);
         superman.send("CONNECT#Superman");
-        Thread.sleep(10);
+        Thread.sleep(100);
         superman.send("CLOSE#");
         
         Thread.sleep(100);
