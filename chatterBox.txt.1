@@ -1,0 +1,16 @@
+sep 11, 2014 12:22:58 PM server.Server startServer
+INFO: Sever started
+sep 11, 2014 12:22:58 PM server.Server startServer
+SEVERE: null
+java.net.BindException: Address already in use: JVM_Bind
+	at java.net.DualStackPlainSocketImpl.bind0(Native Method)
+	at java.net.DualStackPlainSocketImpl.socketBind(DualStackPlainSocketImpl.java:106)
+	at java.net.AbstractPlainSocketImpl.bind(AbstractPlainSocketImpl.java:376)
+	at java.net.PlainSocketImpl.bind(PlainSocketImpl.java:190)
+	at java.net.ServerSocket.bind(ServerSocket.java:376)
+	at java.net.ServerSocket.bind(ServerSocket.java:330)
+	at server.Server.startServer(Server.java:35)
+	at server.Server.main(Server.java:23)
+	at TestClients$1.run(TestClients.java:41)
+	at java.lang.Thread.run(Thread.java:724)
+

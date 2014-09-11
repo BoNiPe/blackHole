@@ -68,8 +68,8 @@ public class ClientHandler extends Thread {
                 send(splitMessageString);
             }
         } while (!isStopped);
-
-        writer.println(Protocol.CLOSE);//Echo the stop message back to the client for a nice closedown
+        System.out.println("CONNECTION CLOSED: " + Protocol.CLOSE);
+        writer.println(Protocol.CLOSE);//Echo the stop message back to the client for a nice closedown 
         
         try {
             socket.close();

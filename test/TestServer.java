@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import server.Server;
 
 /**
  *
@@ -22,10 +23,17 @@ public class TestServer {
     
     @BeforeClass
     public static void setUpClass() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Server.main(null);
+            }
+        }).start();
     }
     
     @AfterClass
     public static void tearDownClass() {
+        Server.stopServer();
     }
     
     @Before
@@ -35,5 +43,9 @@ public class TestServer {
     @After
     public void tearDown() {
     }
+    
+    
+    
+    
     
 }
