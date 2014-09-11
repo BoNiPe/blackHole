@@ -1,16 +1,10 @@
-sep 11, 2014 1:32:04 PM server.Server startServer
+sep 11, 2014 2:00:17 PM server.Server startServer
 INFO: Sever started
-sep 11, 2014 1:32:04 PM server.Server startServer
+sep 11, 2014 2:01:11 PM server.Server startServer
 INFO: Connected to a client
-sep 11, 2014 1:32:04 PM server.Server startServer
+sep 11, 2014 2:01:16 PM server.Server startServer
 INFO: Connected to a client
-sep 11, 2014 1:32:04 PM server.Server startServer
+sep 11, 2014 2:01:32 PM server.Server startServer
 INFO: Connected to a client
-sep 11, 2014 1:32:05 PM server.Server startServer
-INFO: Connected to a client
-sep 11, 2014 1:32:05 PM server.ClientHandler run
-INFO: Closed a Connection
-sep 11, 2014 1:32:05 PM server.ClientHandler run
-INFO: Closed a Connection
-sep 11, 2014 1:32:05 PM server.ClientHandler run
-INFO: Closed a Connection
+sep 11, 2014 2:02:13 PM server.ClientHandler run
+INFO: Received the message: SEND#*#FUCK 
