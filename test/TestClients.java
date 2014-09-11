@@ -19,9 +19,9 @@ import server.Server;
  *
  * @author Desting
  */
-public class TestSeveralClients {
+public class TestClients {
 
-    public TestSeveralClients() {
+    public TestClients() {
     }
 
     String msg;
