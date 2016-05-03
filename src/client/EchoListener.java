@@ -1,6 +1,8 @@
 package client;
 
-interface EchoListener 
+
+// --------------- MADE THIS PUBLIC ------------------
+public interface EchoListener 
 {
     public void messageArrived(String data);
 }
