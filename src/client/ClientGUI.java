@@ -212,7 +212,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
             try {
 
                 currentClient.connect(ip, port); //connects to server
-                //currentClient.registerEchoListener(this); //registers itself
+                currentClient.registerEchoListener(this); //registers itself
                 currentClient.send(Protocol.CONNECT + name.toString());
 
                 jLabelYou.setText("You: " + name);
@@ -239,7 +239,8 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private void jButtonDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisconnectActionPerformed
         try {
             currentClient.stopClient();
-           // currentClient.unRegisterEchoListener(this);
+            Thread.sleep(1000);
+            currentClient.unRegisterEchoListener(this);
             jLabelYou.setText("You: ");
             jButtonDisconnect.setEnabled(false);
             jButtonSend.setEnabled(false);
@@ -252,6 +253,8 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
             onlineClients.clear();
             //jTextPaneChat.setText("");
         } catch (IOException ex) {
+            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
             Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButtonDisconnectActionPerformed
@@ -344,6 +347,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
         for (int i = 0; i < currentClient.globalMessage.size(); i++) {
             toBeDisplayed += currentClient.globalMessage.get(i) + "\n";
         }
+        System.out.println(currentClient.globalMessage.toString());
         jTextPaneChat.setText(toBeDisplayed);
     }
 }

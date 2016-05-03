@@ -34,16 +34,16 @@ public class Client extends Thread implements EchoListener {
 
     public void run() {
         String msg = input.nextLine();
-        //globalMessage.add(msg);
         while ( !msg.equals( Protocol.CLOSE ) ) {
             globalMessage.add( msg );
-            //notifyListeners( msg );
+            notifyListeners( msg );
             msg = input.nextLine();
             messageArrived( msg );
         }
         try {
-//            msg = input.nextLine();
-            //notifyListeners( msg );
+
+            globalMessage.add( msg );
+            notifyListeners( msg );
             socket.close();
             socket = null;
             this.interrupt();
@@ -52,18 +52,43 @@ public class Client extends Thread implements EchoListener {
         }
     }
 
+    public void send( String message ) {
+        System.out.println( "Sending:" );
+        if ( message.contains( Protocol.SEND ) ) {
+            System.out.println( message );
+        }
+        output.println( message );
+    }
+
     public void stopClient() throws IOException {
+        System.out.println( "Stopping client" );
         output.println( Protocol.CLOSE );
     }
 
-    public void send( String message ) {
+    public void registerEchoListener( EchoListener l ) {
+        System.out.println( "Register listener" );
+        listeners.add( l );
+    }
 
-        try {
-            socket.close();
-            socket = null;
-            this.interrupt();
-        } catch ( IOException ex ) {
-            Logger.getLogger( Client.class.getName() ).log( Level.SEVERE, null, ex );
+    public void unRegisterEchoListener( EchoListener l ) {
+        System.out.println( "Unregister listener" );
+        listeners.remove( l );
+    }
+
+    public boolean isClientConnected( EchoListener l ) {
+        System.out.println( "Is client connected" );
+        for ( EchoListener particularOneFromList : listeners ) {
+            if ( l == particularOneFromList ) {
+                return true; //connected
+            }
+        }
+        return false; //not connected
+    }
+
+    private void notifyListeners( String msg ) {
+        System.out.println( "Notify listeners" );
+        for ( EchoListener l : listeners ) {
+            l.messageArrived( msg );
         }
     }
 

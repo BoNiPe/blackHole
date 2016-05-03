@@ -16,13 +16,12 @@ import java.io.IOException;
  */
 public class SaveClients {
 
-    public void savingClients(String tobeIncluded) {
-        System.out.println(" I GO INSIDE YOUR ANUS!");
+    public void actualSaving(String listOfClients) {
         try {
 
-            String content = tobeIncluded;
+            String content = "This is the content to write into file";
 
-            File file = new File("/home/bobkoo/NetBeansProjects/ChatServerFromRabbit/blackHole-TestV3/clientInfo.txt");
+            File file = new File("/home/bobkoo/NetBeansProjects/ChatServerv1.0/ChatServerv1/clientInfo.txt");
 
             // if file doesnt exists, then create it
             if (!file.exists()) {
