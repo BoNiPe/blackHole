@@ -28,7 +28,7 @@ public class Server {
         int port = Integer.parseInt(properties.getProperty("port"));
         String ip = properties.getProperty("serverIp");
         String logFile = properties.getProperty("logFile");
-        //Utils.setLogFile(logFile, Server.class.getName());
+        Utilities.setLogFile(logFile, Server.class.getName());
         Logger.getLogger(Server.class.getName()).log(Level.INFO, "Sever started");
         try {
             serverSocket = new ServerSocket();
@@ -43,19 +43,15 @@ public class Server {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println("SERVER CLOSED");
-        //Utilities.closeLogger(EchoServer.class.getName());
+        Utilities.closeLogger(Server.class.getName());
     }
 
-    
-    // ------------ MADE THIS STATIC ---------------------
-    
     public static void stopServer() {
         isAlive = false;
     }
     
         public synchronized void removeHandler(ClientHandler clientToBeDeleted) {
         ClientHandler temp = null;
-        System.out.println("size: " + listofECH.size());
         for (ClientHandler clientFromList : listofECH) {
             if (clientFromList == clientToBeDeleted) {
                 temp = clientFromList;
