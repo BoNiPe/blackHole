@@ -16,15 +16,15 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     public ClientGUI() {
         initComponents();
-        jButtonDisconnect.setEnabled(false);
-        jButtonSend.setEnabled(false);
-        jTextFieldSend.setEnabled(false);
-        jTextPaneChat.setEnabled(false);
-        jListOnline.setEnabled(false);
-        jButtonNickname.setEnabled(false);
+        jButtonDisconnect.setEnabled( false );
+        jButtonSend.setEnabled( false );
+        jTextFieldSend.setEnabled( false );
+        jTextPaneChat.setEnabled( false );
+        jListOnline.setEnabled( false );
+        jButtonNickname.setEnabled( false );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -178,60 +178,67 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
 
     private void jButtonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSendActionPerformed
 
-        if (jLabelMessageType.getText().contains("'Nickname'")) {
-            if (jTextFieldSend.getText().length() <= 8) {
-                currentClient.send(Protocol.NICKNAME + jTextFieldSend.getText());
-                jLabelYou.setText("You: " + jTextFieldSend.getText());
+        if ( jLabelMessageType.getText().contains( "'Nickname'" ) ) {
+            if ( jTextFieldSend.getText().length() <= 8 ) {
+                currentClient.send( Protocol.NICKNAME + jTextFieldSend.getText() );
+                jLabelYou.setText( "You: " + jTextFieldSend.getText() );
             } else {
-                JOptionPane.showMessageDialog(null, "Nickname is too long.", "ERROR", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog( null, "Nickname is too long.", "ERROR", JOptionPane.WARNING_MESSAGE );
             }
-        } else if (jLabelMessageType.getText().contains("Everyone")) {
-            currentClient.send(Protocol.SEND + Protocol.ALL + jTextFieldSend.getText());
-        } else if (jLabelMessageType.getText().contains("People")) {
-            String[] sendTo = jLabelMessageType.getText().split("-");
-            StringBuffer s = new StringBuffer(sendTo[1]);
-            StringBuffer AfterRemoval = s.deleteCharAt(sendTo[1].length() - 1);
-            System.out.println(">>> " + Protocol.SEND + AfterRemoval.toString() + Protocol.HashTag + jTextFieldSend.getText());
-            currentClient.send(Protocol.SEND + AfterRemoval.toString() + Protocol.HashTag + jTextFieldSend.getText());
+        } else if ( jLabelMessageType.getText().contains( "Everyone" ) ) {
+            currentClient.send( Protocol.SEND + Protocol.ALL + jTextFieldSend.getText() );
+        } else if ( jLabelMessageType.getText().contains( "People" ) ) {
+            String[] sendTo = jLabelMessageType.getText().split( "-" );
+            StringBuffer s = new StringBuffer( sendTo[ 1 ] );
+            StringBuffer AfterRemoval = s.deleteCharAt( sendTo[ 1 ].length() - 1 );
+            
+            currentClient.send( Protocol.SEND + AfterRemoval.toString() + Protocol.HashTag + jTextFieldSend.getText() );
         } else {
-            currentClient.send(Protocol.SEND + jTextFieldSend.getText());
+            currentClient.send( Protocol.SEND + jTextFieldSend.getText() );
         }
-        jTextFieldSend.setText("");
+        jTextFieldSend.setText( "" );
         jTextFieldSend.requestFocus();
-        jButtonNickname.setEnabled(true);
-        jLabelMessageType.setText("to Everyone:");
+        jButtonNickname.setEnabled( true );
+        jLabelMessageType.setText( "to Everyone:" );
     }//GEN-LAST:event_jButtonSendActionPerformed
 
     private void jButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnectActionPerformed
         currentClient = new Client();
-//if statement if that client with that name is connected.
-        Object name = JOptionPane.showInputDialog("Nickname:");
-        if (name.toString().length() <= 8) {
+
+        String name = JOptionPane.showInputDialog( "Nickname:" );
+        if ( name.length() <= 8 ) {
+
+            //Manually connect to the local server
             int port = 9090;
             String ip = "localhost";
+
             try {
 
-                currentClient.connect(ip, port); //connects to server
-                currentClient.registerEchoListener(this); //registers itself
-                currentClient.send(Protocol.CONNECT + name.toString());
+                //connects to server
+                currentClient.connect( ip, port );
 
-                jLabelYou.setText("You: " + name);
-                jButtonDisconnect.setEnabled(true);
-                jButtonSend.setEnabled(true);
-                jButtonNickname.setEnabled(true);
-                jTextFieldSend.setEnabled(true);
-                jButtonConnect.setEnabled(false);
-                jTextPaneChat.setEnabled(true);
-                jListOnline.setEnabled(true);
-                jTextPaneChat.setEditable(false);
-                jLabelMessageType.setText("to Everyone:");
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                //registers itself
+                currentClient.registerEchoListener( this );
+
+                currentClient.send( Protocol.CONNECT + name );
+
+                jLabelYou.setText( "You: " + name );
+                jButtonDisconnect.setEnabled( true );
+                jButtonSend.setEnabled( true );
+                jButtonNickname.setEnabled( true );
+                jTextFieldSend.setEnabled( true );
+                jButtonConnect.setEnabled( false );
+                jTextPaneChat.setEnabled( true );
+                jListOnline.setEnabled( true );
+                jTextPaneChat.setEditable( false );
+                jLabelMessageType.setText( "to Everyone:" );
+            } catch ( UnknownHostException ex ) {
+                Logger.getLogger( Client.class.getName() ).log( Level.SEVERE, null, ex );
+            } catch ( IOException ex ) {
+                Logger.getLogger( Client.class.getName() ).log( Level.SEVERE, null, ex );
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Nickname is too long.", "ERROR", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog( null, "Nickname is too long.", "ERROR", JOptionPane.WARNING_MESSAGE );
         }
 
     }//GEN-LAST:event_jButtonConnectActionPerformed
@@ -239,76 +246,76 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private void jButtonDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisconnectActionPerformed
         try {
             currentClient.stopClient();
-            Thread.sleep(1000);
-            currentClient.unRegisterEchoListener(this);
-            jLabelYou.setText("You: ");
-            jButtonDisconnect.setEnabled(false);
-            jButtonSend.setEnabled(false);
-            jButtonNickname.setEnabled(false);
-            jTextFieldSend.setEnabled(false);
-            jButtonConnect.setEnabled(true);
-            jTextPaneChat.setEnabled(false);
-            jListOnline.setEnabled(false);
-            jTextPaneChat.setEditable(true);
+            Thread.sleep( 1000 );
+            currentClient.unRegisterEchoListener( this );
+            jLabelYou.setText( "You: " );
+            jButtonDisconnect.setEnabled( false );
+            jButtonSend.setEnabled( false );
+            jButtonNickname.setEnabled( false );
+            jTextFieldSend.setEnabled( false );
+            jButtonConnect.setEnabled( true );
+            jTextPaneChat.setEnabled( false );
+            jListOnline.setEnabled( false );
+            jTextPaneChat.setEditable( true );
             onlineClients.clear();
-            //jTextPaneChat.setText("");
-        } catch (IOException ex) {
-            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ClientGUI.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch ( IOException ex ) {
+            Logger.getLogger( ClientGUI.class.getName() ).log( Level.SEVERE, null, ex );
+        } catch ( InterruptedException ex ) {
+            Logger.getLogger( ClientGUI.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }//GEN-LAST:event_jButtonDisconnectActionPerformed
 
     private void jListOnlineMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jListOnlineMouseClicked
-        if (jLabelMessageType.getText().contains("Everyone")) {
-            jLabelMessageType.setText("to People-" + jListOnline.getSelectedValue().toString() + ":");
+        if ( jLabelMessageType.getText().contains( "Everyone" ) ) {
+            jLabelMessageType.setText( "to People-" + jListOnline.getSelectedValue().toString() + ":" );
         } else {
-            if (!jLabelMessageType.getText().contains(jListOnline.getSelectedValue().toString())) {
-                jLabelMessageType.setText(jLabelMessageType.getText().replace(":", "," + jListOnline.getSelectedValue().toString() + ":"));
+            if ( !jLabelMessageType.getText().contains( jListOnline.getSelectedValue().toString() ) ) {
+                jLabelMessageType.setText( jLabelMessageType.getText().replace( ":", "," + jListOnline.getSelectedValue().toString() + ":" ) );
             }
         }
         jListOnline.clearSelection();
     }//GEN-LAST:event_jListOnlineMouseClicked
 
     private void jButtonNicknameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonNicknameActionPerformed
-        jLabelMessageType.setText("Change your 'Nickname' to: ");
-        jButtonNickname.setEnabled(false);
+        jLabelMessageType.setText( "Change your 'Nickname' to: " );
+        jButtonNickname.setEnabled( false );
     }//GEN-LAST:event_jButtonNicknameActionPerformed
 
     private void jButtonClearSelectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonClearSelectionActionPerformed
-        jLabelMessageType.setText("to Everyone:");
+        jLabelMessageType.setText( "to Everyone:" );
     }//GEN-LAST:event_jButtonClearSelectionActionPerformed
 
-    public static void main(String args[]) {
+    public static void main( String args[] ) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+            for ( javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels() ) {
+                if ( "Nimbus".equals( info.getName() ) ) {
+                    javax.swing.UIManager.setLookAndFeel( info.getClassName() );
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ClientGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch ( ClassNotFoundException ex ) {
+            java.util.logging.Logger.getLogger( ClientGUI.class.getName() ).log( java.util.logging.Level.SEVERE, null, ex );
+        } catch ( InstantiationException ex ) {
+            java.util.logging.Logger.getLogger( ClientGUI.class.getName() ).log( java.util.logging.Level.SEVERE, null, ex );
+        } catch ( IllegalAccessException ex ) {
+            java.util.logging.Logger.getLogger( ClientGUI.class.getName() ).log( java.util.logging.Level.SEVERE, null, ex );
+        } catch ( javax.swing.UnsupportedLookAndFeelException ex ) {
+            java.util.logging.Logger.getLogger( ClientGUI.class.getName() ).log( java.util.logging.Level.SEVERE, null, ex );
         }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater( new Runnable() {
             public void run() {
-                new ClientGUI().setVisible(true);
+                new ClientGUI().setVisible( true );
             }
-        });
+        } );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -330,24 +337,24 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private DefaultListModel onlineClients = new DefaultListModel();
 
     @Override
-    public void messageArrived(String data) {
-        System.out.println("messageArrived(String data) (ClientGUI): " + data);
+    public void messageArrived( String data ) {
+
         String toBeDisplayed = "";
-        if (data.contains(Protocol.ONLINE)) {
+        if ( data.contains( Protocol.ONLINE ) ) {
+            //Looks fine, but sometimes it's buggy.
             onlineClients.clear();
-            String[] result = data.split("#");
-            List<String> items = Arrays.asList(result[1].split("\\s*,\\s*"));
-            for (int i = 0; i < items.size(); i++) {
-                if (!jLabelYou.getText().contains(items.get(i))) {
-                    onlineClients.addElement(items.get(i));
+            String[] result = data.split( "#" );
+            List<String> items = Arrays.asList( result[ 1 ].split( "\\s*,\\s*" ) );
+            for ( int i = 0; i < items.size(); i++ ) {
+                if ( !jLabelYou.getText().contains( items.get( i ) ) ) {
+                    onlineClients.addElement( items.get( i ) );
                 }
             }
-            jListOnline.setModel(onlineClients);
+            jListOnline.setModel( onlineClients );
         }
-        for (int i = 0; i < currentClient.globalMessage.size(); i++) {
-            toBeDisplayed += currentClient.globalMessage.get(i) + "\n";
+        for ( int i = 0; i < currentClient.globalMessage.size(); i++ ) {
+            toBeDisplayed += currentClient.globalMessage.get( i ) + "\n";
         }
-        System.out.println(currentClient.globalMessage.toString());
-        jTextPaneChat.setText(toBeDisplayed);
+        jTextPaneChat.setText( toBeDisplayed );
     }
 }

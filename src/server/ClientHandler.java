@@ -10,20 +10,28 @@ import shared.Protocol;
 
 public class ClientHandler extends Thread {
 
+    //Client Components
     private Scanner input;
     private PrintWriter writer;
     private Socket socket;
     private Server myServer;
+
+    //Current user nickname
     private String nickname;
+
+    //Online users
     private String listOfHandlerNames;
+
+    //Client connection controller
     private boolean isStopped = false;
 
+    //System logger
     private Logger chatLogger;
 
     public ClientHandler( Socket socket, Server myServer, Logger chatLogger ) {
         try {
-            input = new Scanner( socket.getInputStream() );
-            writer = new PrintWriter( socket.getOutputStream(), true );
+            this.input = new Scanner( socket.getInputStream() );
+            this.writer = new PrintWriter( socket.getOutputStream(), true );
             this.socket = socket;
             this.myServer = myServer;
             this.chatLogger = chatLogger;
@@ -37,44 +45,52 @@ public class ClientHandler extends Thread {
     public void run() {
         String message = "";
         do {
-            message = input.nextLine(); //important blocking call
-            chatLogger.info( "Received message from user " + getNickname() + ": " + message );
-            String[] messageParts = message.split( "#" );
+            try {
+                message = input.nextLine(); //important blocking call
+            } catch ( java.util.NoSuchElementException ex ) {
+                isStopped = true;
+            }
 
-            switch ( messageParts[ 0 ] + "#" ) { //Follow protocol string syntax
-                case Protocol.CONNECT:
+            if ( !isStopped ) {
+                chatLogger.info( "Received message from user " + getNickname() + ": " + message );
+                String[] messageParts = message.split( "#" );
 
-                    setNickname( messageParts[ 1 ] );
-                    sendListOfClients();
-                    chatLogger.info( "User " + getNickname() + " connected successfully" );
+                switch ( messageParts[ 0 ] + "#" ) { //Follow protocol string syntax
+                    case Protocol.CONNECT:
 
-                    break;
-                case Protocol.SEND:
+                        setNickname( messageParts[ 1 ] );
+                        sendListOfClients();
+                        chatLogger.info( "User " + getNickname() + " connected successfully" );
 
-                    if ( Protocol.ALL.equals( messageParts[ 1 ] + "#" ) ) {
-                        sendPublicMessage( Protocol.MESSAGE, this.getNickname()
-                                           + Protocol.HashTag + messageParts[ 2 ] );
-                    } else {
-                        sendPrivateMessage( messageParts[ 1 ], Protocol.PRIVATEMESSAGE
-                                            + this.getNickname() + Protocol.HashTag
-                                            + messageParts[ 2 ] );
-                    }
+                        break;
+                    case Protocol.SEND:
 
-                    chatLogger.info( "User " + getNickname() + " send message to " + messageParts[ 1 ] + " : " + messageParts[ 2 ] );
-                    break;
-                case Protocol.NICKNAME:
+                        if ( Protocol.ALL.equals( messageParts[ 1 ] + "#" ) ) {
+                            sendPublicMessage( Protocol.MESSAGE, this.getNickname()
+                                               + Protocol.HashTag + messageParts[ 2 ] );
+                        } else {
+                            sendPrivateMessage( messageParts[ 1 ], Protocol.PRIVATEMESSAGE
+                                                + this.getNickname() + Protocol.HashTag
+                                                + messageParts[ 2 ] );
+                        }
 
-                    String oldNickname = getNickname();
-                    setNickname( messageParts[ 1 ] );
+                        chatLogger.info( "User " + getNickname() + " send message to " + messageParts[ 1 ] + " : " + messageParts[ 2 ] );
+                        break;
+                    case Protocol.NICKNAME:
 
-                    sendPublicMessage( "NAMECHANGE#", oldNickname + "#BECAME#" + getNickname() );
-                    sendListOfClients();
-                    chatLogger.info( "User " + oldNickname + " changed name to " + getNickname() );
-                    break;
-                default:
-                    chatLogger.warning( "Incorrect message or close request, User : " + getNickname() );
-                    isStopped = true;
-                    break;
+                        String oldNickname = getNickname();
+                        setNickname( messageParts[ 1 ] );
+
+                        sendPublicMessage( Protocol.NAMECHANGE, oldNickname + Protocol.BECAME + getNickname() );
+                        sendListOfClients();
+                        chatLogger.info( "User " + oldNickname + " changed name to " + getNickname() );
+                        break;
+                    default:
+                        chatLogger.warning( "Incorrect message or close request, User : " + getNickname() );
+                        isStopped = true;
+                        break;
+                }
+                chatLogger.warning( "Incorrect message or close request, User : " + getNickname() );
             }
         } while ( !isStopped );
 
@@ -88,7 +104,7 @@ public class ClientHandler extends Thread {
 
             socket.close();
             myServer.removeHandler( this );
-            sendPublicMessage( "DISCONNECT#", getNickname() );
+            sendPublicMessage( Protocol.DISCONNECT, getNickname() );
             sendListOfClients();
 
         } catch ( IOException ex ) {

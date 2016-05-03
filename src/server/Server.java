@@ -14,11 +14,18 @@ import utilities.ChatServerLogger;
 
 public class Server {
 
+    //Server status
     private static boolean isAlive = true;
-    private static ServerSocket serverSocket;
+
+    //Server properties
     private static final Properties properties = ChatServerLogger.initProperties( "server.properties" );
-    public static List<ClientHandler> listofECH = Collections.synchronizedList( new ArrayList() );
+    private static ServerSocket serverSocket;
+
+    //System logger
     public static Logger chatLogger;
+
+    //List of Clients (Handlers)
+    public static List<ClientHandler> listofECH = Collections.synchronizedList( new ArrayList() );
 
     public static void main( String[] args ) {
         new Server().startServer();

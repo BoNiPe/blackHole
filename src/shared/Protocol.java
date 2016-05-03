@@ -13,9 +13,15 @@ public class Protocol {
     
     public static final String PRIVATEMESSAGE = "PRIVATEMESSAGE#";
     
+    public static final String NAMECHANGE = "NAMECHANGE#";
+    
+    public static final String BECAME = "#BECAME#";
+    
     public static final String NICKNAME = "NICKNAME#";
     
     public static final String ONLINE = "ONLINE#";
+    
+    public static final String DISCONNECT = "DISCONNECT#";
     
     public static final String HashTag = "#";
     

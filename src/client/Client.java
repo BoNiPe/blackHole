@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import shared.Protocol;
 
-public class Client extends Thread implements EchoListener {
+public class Client extends Thread {
 
     Socket socket;
     private int port;
@@ -28,21 +28,18 @@ public class Client extends Thread implements EchoListener {
         socket = new Socket( serverAddress, port );
         input = new Scanner( socket.getInputStream() );
         output = new PrintWriter( socket.getOutputStream(), true );  //Set to true, to get auto flush behaviour
-        System.out.println( getState() );
         start();
     }
 
     public void run() {
         String msg = input.nextLine();
-        System.out.println( "Clients input is : " + msg );
+
         while ( !msg.equals( Protocol.CLOSE ) ) {
             globalMessage.add( msg );
             notifyListeners( msg );
             msg = input.nextLine();
-            messageArrived( msg );
         }
         try {
-
             globalMessage.add( msg );
             notifyListeners( msg );
             socket.close();
@@ -54,30 +51,22 @@ public class Client extends Thread implements EchoListener {
     }
 
     public void send( String message ) {
-        System.out.println( "Sending:" );
-        if ( message.contains( Protocol.SEND ) ) {
-            System.out.println( message );
-        }
         output.println( message );
     }
 
     public void stopClient() throws IOException {
-        System.out.println( "Stopping client" );
         output.println( Protocol.CLOSE );
     }
 
     public void registerEchoListener( EchoListener l ) {
-        System.out.println( "Register listener" );
         listeners.add( l );
     }
 
     public void unRegisterEchoListener( EchoListener l ) {
-        System.out.println( "Unregister listener" );
         listeners.remove( l );
     }
 
     public boolean isClientConnected( EchoListener l ) {
-        System.out.println( "Is client connected" );
         for ( EchoListener particularOneFromList : listeners ) {
             if ( l == particularOneFromList ) {
                 return true; //connected
@@ -87,14 +76,8 @@ public class Client extends Thread implements EchoListener {
     }
 
     private void notifyListeners( String msg ) {
-        System.out.println( "Notify listeners" );
         for ( EchoListener l : listeners ) {
             l.messageArrived( msg );
         }
-    }
-
-    @Override
-    public void messageArrived( String data ) {
-        System.out.println( "messageArrived(String data) (Client): " + data );
     }
 }
