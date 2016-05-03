@@ -34,6 +34,7 @@ public class Client extends Thread implements EchoListener {
 
     public void run() {
         String msg = input.nextLine();
+        System.out.println( "Clients input is : " + msg );
         while ( !msg.equals( Protocol.CLOSE ) ) {
             globalMessage.add( msg );
             notifyListeners( msg );

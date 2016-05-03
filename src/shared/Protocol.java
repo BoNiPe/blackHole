@@ -11,6 +11,8 @@ public class Protocol {
     
     public static final String MESSAGE = "MESSAGE#";
     
+    public static final String PRIVATEMESSAGE = "PRIVATEMESSAGE#";
+    
     public static final String NICKNAME = "NICKNAME#";
     
     public static final String ONLINE = "ONLINE#";

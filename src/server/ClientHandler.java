@@ -7,7 +7,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import shared.Protocol;
-import utilities.SaveClients;
 
 public class ClientHandler extends Thread {
 
@@ -19,12 +18,15 @@ public class ClientHandler extends Thread {
     private String listOfHandlerNames;
     private boolean isStopped = false;
 
-    public ClientHandler( Socket socket, Server myServer ) {
+    private Logger chatLogger;
+
+    public ClientHandler( Socket socket, Server myServer, Logger chatLogger ) {
         try {
             input = new Scanner( socket.getInputStream() );
             writer = new PrintWriter( socket.getOutputStream(), true );
             this.socket = socket;
             this.myServer = myServer;
+            this.chatLogger = chatLogger;
         } catch ( IOException ex ) {
             Logger.getLogger( ClientHandler.class.getName() ).log( Level.SEVERE, null, ex );
         }
@@ -35,77 +37,82 @@ public class ClientHandler extends Thread {
     public void run() {
         String message = "";
         do {
+            message = input.nextLine(); //important blocking call
+            chatLogger.info( "Received message from user " + getNickname() + ": " + message );
+            String[] messageParts = message.split( "#" );
 
-            message = input.nextLine(); //IMPORTANT blocking call
-            if ( message.contains( Protocol.ALL ) ) {
-                System.out.println( "Sending to ALL" );
-                String[] result = message.split( "#" );
+            switch ( messageParts[ 0 ] + "#" ) { //Follow protocol string syntax
+                case Protocol.CONNECT:
 
-                int size = result.length;
-                if ( size == 3 ) {
-                    send( Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[ 2 ] );
-                    System.out.println( "Sending : " + Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[ 2 ] );
-                } else if ( size == 2 ) {
-                    send( Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[ 1 ] );
-                    System.out.println( "Sending : " + Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + result[ 1 ] );
-                }
+                    setNickname( messageParts[ 1 ] );
+                    sendListOfClients();
+                    chatLogger.info( "User " + getNickname() + " connected successfully" );
 
-                Logger.getLogger( Server.class.getName() ).log( Level.INFO, String.format( "Received the message: %1$S ", message ) );
+                    break;
+                case Protocol.SEND:
 
-            } else if ( message.contains( Protocol.CONNECT ) ) {
-                System.out.println( "Connecting" );
-                String[] result = message.split( "#" );
-                setNickname( result[ 1 ] ); //Extract Client's nickname
-                send(); //List of active users
-            } else if ( message.contains( Protocol.NICKNAME ) ) {
-                System.out.println( "Nickname" );
-                String[] result = message.split( "#" );
-                send( Protocol.NICKNAME + result[ 1 ] );
-                setNickname( result[ 1 ] );
-                send();
-
-            } else if ( message.contains( Protocol.CLOSE ) ) {
-                System.out.println( "Closing" );
-                for ( ClientHandler handler : myServer.getListofECH() ) {
-                    if ( handler == this ) {
-                        handler.writer.println( message );
+                    if ( Protocol.ALL.equals( messageParts[ 1 ] + "#" ) ) {
+                        sendPublicMessage( Protocol.MESSAGE, this.getNickname()
+                                           + Protocol.HashTag + messageParts[ 2 ] );
+                    } else {
+                        sendPrivateMessage( messageParts[ 1 ], Protocol.PRIVATEMESSAGE
+                                            + this.getNickname() + Protocol.HashTag
+                                            + messageParts[ 2 ] );
                     }
-                }
-                isStopped = true; //Go out of do while
-            } else { //Whispering
-                String[] splitMessageString = message.split( "#" );
-                send( splitMessageString );
+
+                    chatLogger.info( "User " + getNickname() + " send message to " + messageParts[ 1 ] + " : " + messageParts[ 2 ] );
+                    break;
+                case Protocol.NICKNAME:
+
+                    String oldNickname = getNickname();
+                    setNickname( messageParts[ 1 ] );
+
+                    sendPublicMessage( "NAMECHANGE#", oldNickname + "#BECAME#" + getNickname() );
+                    sendListOfClients();
+                    chatLogger.info( "User " + oldNickname + " changed name to " + getNickname() );
+                    break;
+                default:
+                    chatLogger.warning( "Incorrect message or close request, User : " + getNickname() );
+                    isStopped = true;
+                    break;
             }
         } while ( !isStopped );
-        if ( message.equals( Protocol.CLOSE ) ) {
-            System.out.println( "hello" );
-            writer.println( Protocol.CLOSE );//Echo the stop message back to the client for a nice closedown
-        }
-        try {
-            socket.close();
-            myServer.removeHandler( this );
-            send(); //Refreshing the list of active clients for the others, who are still connected.
-        } catch ( IOException ex ) {
-            Logger.getLogger( ClientHandler.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-        Logger.getLogger( Server.class.getName() ).log( Level.INFO, "Closed a Connection" );
-    }
-
-    //Generated send message
-    private void send( String msg ) {
-//        String ip = socket.getInetAddress().getHostAddress();
-//        int port = socket.getPort();
 
         for ( ClientHandler handler : myServer.getListofECH() ) {
-            System.out.println( "Sending..." );
-            handler.writer.println( msg );
+            if ( handler == this ) {
+                handler.writer.println( message );
+            }
+        }
+
+        try {
+
+            socket.close();
+            myServer.removeHandler( this );
+            sendPublicMessage( "DISCONNECT#", getNickname() );
+            sendListOfClients();
+
+        } catch ( IOException ex ) {
+            chatLogger.severe( "IOException while trying to close the socket : " + ex.getMessage() );
+        }
+        chatLogger.info( "Connection with " + getNickname() + " closed." );
+    }
+
+    private void sendPublicMessage( String type, String msg ) {
+        for ( ClientHandler handler : myServer.getListofECH() ) {
+            handler.writer.println( type + msg );
         }
     }
 
-    //List of active users
-    private void send() {
-        listOfHandlerNames = "";
+    private void sendPrivateMessage( String userName, String message ) {
+        for ( ClientHandler handler : myServer.getListofECH() ) {
+            if ( userName.equals( handler.getNickname() ) ) {
+                handler.writer.println( message );
+            }
+        }
+    }
 
+    private void sendListOfClients() {
+        listOfHandlerNames = "";
         Integer ammountOfClients = myServer.getListofECH().size();
         for ( int i = 0; i < ammountOfClients; i++ ) {
             if ( i < ammountOfClients - 1 ) {
@@ -115,33 +122,7 @@ public class ClientHandler extends Thread {
             }
         }
         for ( int i = 0; i < ammountOfClients; i++ ) {
-
             myServer.getListofECH().get( i ).writer.println( Protocol.ONLINE + listOfHandlerNames );
-
-        }
-        SaveClients sc = new SaveClients();
-        //sc.actualSaving(listOfHandlerNames);
-
-    }
-
-    //Whispering til en person eller mange mennesker
-    private void send( String[] splitMessageString ) {
-        int size = myServer.getListofECH().size();
-        if ( splitMessageString[ 1 ].contains( "," ) ) { //, means that there are more than 1 names
-            String[] listOfClientsToReceiveMessage = splitMessageString[ 1 ].split( "," );
-            for ( int i = 0; i < listOfClientsToReceiveMessage.length; i++ ) {
-                for ( int j = 0; j < size; j++ ) {
-                    if ( myServer.getListofECH().get( j ).getNickname().equals( listOfClientsToReceiveMessage[ i ] ) ) {
-                        myServer.getListofECH().get( j ).writer.println( Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[ 2 ] );
-                    }
-                }
-            }
-        } else { //If there is only one name
-            for ( int j = 0; j < size; j++ ) {
-                if ( myServer.getListofECH().get( j ).getNickname().equals( splitMessageString[ 1 ] ) ) {
-                    myServer.getListofECH().get( j ).writer.println( Protocol.MESSAGE + this.getNickname() + Protocol.HashTag + splitMessageString[ 2 ] );
-                }
-            }
         }
     }
 

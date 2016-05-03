@@ -12,11 +12,11 @@ import java.util.Scanner;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import utilities.Utilities;
+import utilities.ChatServerLogger;
 
 public class HTTPServer {
 
-    private static final Properties properties = Utilities.initProperties("server.properties");
+    private static final Properties properties = ChatServerLogger.initProperties("server.properties");
 
     public static void main(String[] args) throws IOException {
         new HTTPServer().reading();
@@ -24,7 +24,7 @@ public class HTTPServer {
 
     public void reading() throws IOException {
 //        String logFile = properties.getProperty("logFile");
-//        Logger logger = Utilities.getLogger(logFile, HTTPServer.class.getName());
+//        Logger logger = ChatServerLogger.getLogger(logFile, HTTPServer.class.getName());
 //        System.out.println("1. "+logger.toString());
 //        for (Handler h : Logger.getLogger(HTTPServer.class.getName()).getHandlers())
 //        {
