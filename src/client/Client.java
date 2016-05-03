@@ -37,22 +37,13 @@ public class Client extends Thread implements EchoListener {
         //globalMessage.add(msg);
         while ( !msg.equals( Protocol.CLOSE ) ) {
             globalMessage.add( msg );
-            notifyListeners( msg );
+            //notifyListeners( msg );
             msg = input.nextLine();
             messageArrived( msg );
         }
         try {
-            socket.close();
-            socket = null;
-            this.interrupt();
-        } catch ( IOException ex ) {
-            Logger.getLogger( Client.class.getName() ).log( Level.SEVERE, null, ex );
-        }
-    }
-
-    public void send( String message ) {
-
-        try {
+//            msg = input.nextLine();
+            //notifyListeners( msg );
             socket.close();
             socket = null;
             this.interrupt();
@@ -65,26 +56,14 @@ public class Client extends Thread implements EchoListener {
         output.println( Protocol.CLOSE );
     }
 
-    public void registerEchoListener( EchoListener l ) {
-        listeners.add( l );
-    }
+    public void send( String message ) {
 
-    public void unRegisterEchoListener( EchoListener l ) {
-        listeners.remove( l );
-    }
-
-    public boolean isClientConnected( EchoListener l ) {
-        for ( EchoListener particularOneFromList : listeners ) {
-            if ( l == particularOneFromList ) {
-                return true; //connected
-            }
-        }
-        return false; //not connected
-    }
-
-    private void notifyListeners( String msg ) {
-        for ( EchoListener l : listeners ) {
-            l.messageArrived( msg );
+        try {
+            socket.close();
+            socket = null;
+            this.interrupt();
+        } catch ( IOException ex ) {
+            Logger.getLogger( Client.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
 

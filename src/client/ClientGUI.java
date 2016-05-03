@@ -212,7 +212,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
             try {
 
                 currentClient.connect(ip, port); //connects to server
-                currentClient.registerEchoListener(this); //registers itself
+                //currentClient.registerEchoListener(this); //registers itself
                 currentClient.send(Protocol.CONNECT + name.toString());
 
                 jLabelYou.setText("You: " + name);
@@ -239,7 +239,7 @@ public class ClientGUI extends javax.swing.JFrame implements EchoListener {
     private void jButtonDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisconnectActionPerformed
         try {
             currentClient.stopClient();
-            currentClient.unRegisterEchoListener(this);
+           // currentClient.unRegisterEchoListener(this);
             jLabelYou.setText("You: ");
             jButtonDisconnect.setEnabled(false);
             jButtonSend.setEnabled(false);
